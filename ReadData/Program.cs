@@ -28,33 +28,26 @@ namespace ReadData
 				// Start timer
 				Stopwatch stopWatch = Stopwatch.StartNew();
 
-				// Dictionary to capture unique word, fullword and count of occurances
-				Dictionary<string, KeyPair> uniqueWords = new Dictionary<string, KeyPair>();
+                // Dictionary to capture unique word, fullword and count of occurances
+                // Used Dictionary as it maintains data in Key and Values with uniqueness,
+				// and getting data is faster as it uses key as index
+                Dictionary<string, KeyPair> uniqueWords = new Dictionary<string, KeyPair>();
 
 				// Read all lines from input file
 				foreach (string word in File.ReadAllLines($"{RelativePath}InputData/words.txt"))
 				{
-					int strLength = word.Length;
-
-					if (strLength >= SubStrLength)
+					if (word.Length >= SubStrLength)
 					{
-						if (strLength == SubStrLength && !uniqueWords.ContainsKey(word))
+						// Extract possible substrings for each word and capture the occurances
+						foreach (string subStr in GetSubstrings(word))
 						{
-							uniqueWords.Add(word, new KeyPair(word, 1));
-						}
-						else
-						{
-							// Extract possible substrings for each word and capture the occurances
-							foreach (string subStr in GetSubstrings(word, SubStrLength))
+							if (!uniqueWords.ContainsKey(subStr))
 							{
-								if (!uniqueWords.ContainsKey(subStr))
-								{
-									uniqueWords.Add(subStr, new KeyPair(word, 1));
-								}
-								else
-								{
-									uniqueWords[subStr].Count += 1;
-								}
+								uniqueWords.Add(subStr, new KeyPair(word, 1));
+							}
+							else
+							{
+								uniqueWords[subStr].Count += 1;
 							}
 						}
 					}
@@ -82,13 +75,12 @@ namespace ReadData
 		/// Get substrings for the given string
 		/// </summary>
 		/// <param name="input">Input string</param>
-		/// <param name="subStrLength">Length of substring</param>
 		/// <returns>Returns substrings</returns>
-		public static IEnumerable<string> GetSubstrings(string input, int subStrLength)
+		public static IEnumerable<string> GetSubstrings(string input)
 		{
-			for (int i = 0; i <= input.Length - subStrLength; i++)
+			for (int i = 0; i <= input.Length - SubStrLength; i++)
 			{
-				yield return (input.Substring(i, subStrLength));
+				yield return (input.Substring(i, SubStrLength));
 			}
 		}
 
